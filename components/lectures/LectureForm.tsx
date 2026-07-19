@@ -1,61 +1,67 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import type { Lecture, Sourate } from '@/types/lecture'
-import type { Recitant } from '@/types/recitant'
+} from "@/components/ui/select";
+import type { Lecture, Sourate } from "@/types/lecture";
+import type { Recitant } from "@/types/recitant";
 
 type Props = {
-  mode: 'create' | 'edit'
-  lecture?: Lecture
-  recitants: Recitant[]
-  sourates: Sourate[]
-}
+  mode: "create" | "edit";
+  lecture?: Lecture;
+  recitants: Recitant[];
+  sourates: Sourate[];
+};
 
-export default function LectureForm({ mode, lecture, recitants, sourates }: Props) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [recitantId, setRecitantId] = useState(lecture?.recitant_id ?? '')
+export default function LectureForm({
+  mode,
+  lecture,
+  recitants,
+  sourates,
+}: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [recitantId, setRecitantId] = useState(lecture?.recitant_id ?? "");
   const [sourateId, setSourateId] = useState(
-    lecture?.sourate_id ? String(lecture.sourate_id) : ''
-  )
-  const router = useRouter()
+    lecture?.sourate_id ? String(lecture.sourate_id) : "",
+  );
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    const formData = new FormData(e.currentTarget)
-    formData.set('recitant_id', recitantId)
-    formData.set('sourate_id', sourateId)
+    const formData = new FormData(e.currentTarget);
+    formData.set("recitant_id", recitantId);
+    formData.set("sourate_id", sourateId);
 
-    const url = mode === 'create' ? '/api/lectures' : `/api/lectures/${lecture!.id}`
-    const method = mode === 'create' ? 'POST' : 'PUT'
+    const url =
+      mode === "create" ? "/api/lectures" : `/api/lectures/${lecture!.id}`;
+    const method = mode === "create" ? "POST" : "PUT";
 
-    const res = await fetch(url, { method, body: formData })
+    const res = await fetch(url, { method, body: formData });
 
     if (!res.ok) {
-      const data = await res.json()
-      setError(data.error ?? 'Erreur inconnue')
-      setLoading(false)
-      return
+      const data = await res.json();
+      setError(data.error ?? "Erreur inconnue");
+      setLoading(false);
+      return;
     }
 
-    router.push('/admin/lectures')
-    router.refresh()
-  }
+    router.push("/admin/lectures");
+    router.refresh();
+  };
 
   return (
     <Card>
@@ -68,7 +74,12 @@ export default function LectureForm({ mode, lecture, recitants, sourates }: Prop
 
           <div className="space-y-2">
             <Label>Récitant</Label>
-            <Select value={recitantId} onValueChange={setRecitantId} required>
+            <Select
+              value={recitantId}
+              onValueChange={(value) => setRecitantId(value ?? "")}
+              required
+            >
+              {" "}
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choisir un récitant" />
               </SelectTrigger>
@@ -84,7 +95,11 @@ export default function LectureForm({ mode, lecture, recitants, sourates }: Prop
 
           <div className="space-y-2">
             <Label>Sourate</Label>
-            <Select value={sourateId} onValueChange={setSourateId}>
+            <Select
+              value={sourateId}
+              onValueChange={(value) => setSourateId(value ?? "")}
+            >
+              {" "}
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choisir une sourate (optionnel)" />
               </SelectTrigger>
@@ -104,17 +119,17 @@ export default function LectureForm({ mode, lecture, recitants, sourates }: Prop
               id="titre"
               name="titre"
               placeholder="ex: Récitation Ramadan 2024"
-              defaultValue={lecture?.titre ?? ''}
+              defaultValue={lecture?.titre ?? ""}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="image">
               Image de couverture (optionnel)
-              {mode === 'edit' && " — laisser vide pour garder l'actuelle"}
+              {mode === "edit" && " — laisser vide pour garder l'actuelle"}
             </Label>
             <Input id="image" name="image" type="file" accept="image/*" />
-            {mode === 'edit' && lecture?.image_url && (
+            {mode === "edit" && lecture?.image_url && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={lecture.image_url}
@@ -126,29 +141,30 @@ export default function LectureForm({ mode, lecture, recitants, sourates }: Prop
 
           <div className="space-y-2">
             <Label htmlFor="audio">
-              Fichier audio {mode === 'edit' && "(laisser vide pour garder l'actuel)"}
+              Fichier audio{" "}
+              {mode === "edit" && "(laisser vide pour garder l'actuel)"}
             </Label>
             <Input
               id="audio"
               name="audio"
               type="file"
               accept="audio/*"
-              required={mode === 'create'}
+              required={mode === "create"}
             />
-            {mode === 'edit' && lecture?.audio_url && (
+            {mode === "edit" && lecture?.audio_url && (
               <audio controls src={lecture.audio_url} className="w-full mt-2" />
             )}
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
             {loading
-              ? 'Enregistrement...'
-              : mode === 'create'
-              ? 'Enregistrer'
-              : 'Enregistrer les modifications'}
+              ? "Enregistrement..."
+              : mode === "create"
+                ? "Enregistrer"
+                : "Enregistrer les modifications"}
           </Button>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }
