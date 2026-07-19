@@ -1,3 +1,5 @@
+import type { Recitant } from './recitant'
+
 export type Lecture = {
   id: string
   recitant_id: string
@@ -10,7 +12,7 @@ export type Lecture = {
   nombre_ecoutes: number
   nombre_telechargements: number
   created_at?: string
-  recitants?: { id: string; nom: string; prenom: string }
+  recitants?: Pick<Recitant, 'id' | 'nom' | 'prenom' | 'nationalite' | 'photo_url'>
   sourates?: { id: number; nom_francais: string; nom_arabe: string }
 }
 
